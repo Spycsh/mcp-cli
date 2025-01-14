@@ -4,7 +4,9 @@ import uuid
 from typing import Any, Dict, List
 import json
 
-import ollama
+# import ollama
+from ollama import Client
+
 from dotenv import load_dotenv
 from openai import OpenAI
 from anthropic import Anthropic
@@ -19,6 +21,9 @@ class LLMClient:
         self.provider = provider
         self.model = model
         self.api_key = api_key
+        self.client = Client(
+          host=os.environ["OLLAMA_ENDPOINT"] if "OLLAMA_ENDPOINT" in os.environ else "http://localhost:11434",
+        )
 
         # ensure we have the api key for openai if set
         if provider == "openai":
@@ -31,7 +36,7 @@ class LLMClient:
             if not self.api_key:
                 raise ValueError("The ANTHROPIC_API_KEY environment variable is not set.")
         # check ollama is good
-        elif provider == "ollama" and not hasattr(ollama, "chat"):
+        elif provider == "ollama" and not hasattr(self.client, "chat"):
             raise ValueError("Ollama is not properly configured in this environment.")
 
     def create_completion(
@@ -194,7 +199,7 @@ class LLMClient:
 
         try:
             # Make API call with tools
-            response = ollama.chat(
+            response = self.client.chat(
                 model=self.model,
                 messages=ollama_messages,
                 stream=False,
