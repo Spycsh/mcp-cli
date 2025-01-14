@@ -26,10 +26,9 @@ RUN chmod +x /usr/local/bin/insert_employees.sh
 # Run the employee script to populate the SQLite database
 RUN bash /usr/local/bin/insert_employees.sh
 
-# Default command to run MCP server and client
-RUN nohup $HOME/.local/bin/uvx mcp-server-sqlite --db-path employees.db &
-
 ENTRYPOINT ["sleep", "infinity"]
 
-# start a client
-# RUN $HOME/.local/bin/uv run mcp-cli --server sqlite --provider ollama --model qwen2.5-coder
+# enter into the container and start a mcp sqlite server based on provided database and
+# start a client (check the server_config.json)
+# $HOME/.local/bin/uvx mcp-server-sqlite --db-path employees.db > /var/log/mcp-server.log 2>&1 &
+# $HOME/.local/bin/uv run mcp-cli --server sqlite --provider ollama --model qwen2.5-coder
